@@ -159,6 +159,11 @@ public class Util {
         return null;
     }
 
+    /**
+     * 后缀名
+     * @param filename
+     * @return
+     */
     public static String getExtFromFilename(String filename) {
         int dotPosition = filename.lastIndexOf('.');
         if (dotPosition != -1) {

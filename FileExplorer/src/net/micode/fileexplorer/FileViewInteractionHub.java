@@ -22,6 +22,11 @@ package net.micode.fileexplorer;
 import java.io.File;
 import java.util.ArrayList;
 
+import net.micode.fileexplorer.FileListItem.ModeCallback;
+import net.micode.fileexplorer.FileOperationHelper.IOperationProgressListener;
+import net.micode.fileexplorer.FileSortHelper.SortMethod;
+import net.micode.fileexplorer.FileViewActivity.SelectFilesCallback;
+import net.micode.fileexplorer.TextInputDialog.OnFinishListener;
 import android.R.drawable;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,7 +36,9 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -55,12 +62,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import net.micode.fileexplorer.FileListItem.ModeCallback;
-import net.micode.fileexplorer.FileOperationHelper.IOperationProgressListener;
-import net.micode.fileexplorer.FileSortHelper.SortMethod;
-import net.micode.fileexplorer.FileViewActivity.SelectFilesCallback;
-import net.micode.fileexplorer.TextInputDialog.OnFinishListener;
 
 public class FileViewInteractionHub implements IOperationProgressListener {
     private static final String LOG_TAG = "FileViewInteractionHub";
@@ -577,18 +578,24 @@ public class FileViewInteractionHub implements IOperationProgressListener {
         if (path == null)
             return;
         final File f = new File(path);
-        final Intent intent;
-        if (f.isDirectory()) {
-            intent = new Intent(Intent.ACTION_MEDIA_MOUNTED);
-            intent.setClassName("com.android.providers.media", "com.android.providers.media.MediaScannerReceiver");
-            intent.setData(Uri.fromFile(Environment.getExternalStorageDirectory()));
-            Log.v(LOG_TAG, "directory changed, send broadcast:" + intent.toString());
-        } else {
-            intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            intent.setData(Uri.fromFile(new File(path)));
-            Log.v(LOG_TAG, "file changed, send broadcast:" + intent.toString());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) { //添加此判断，判断SDK版本是不是4.4或者高于4.4  
+//            String[] paths = new String[]{Environment.getExternalStorageDirectory().toString()};  
+            String[] paths = new String[]{path};  
+            MediaScannerConnection.scanFile(mContext, paths, null, null);  
+        } else { 
+        	final Intent intent;
+        	if (f.isDirectory()) {
+        		intent = new Intent(Intent.ACTION_MEDIA_MOUNTED);
+        		intent.setClassName("com.android.providers.media", "com.android.providers.media.MediaScannerReceiver");
+        		intent.setData(Uri.fromFile(Environment.getExternalStorageDirectory()));
+        		Log.v(LOG_TAG, "directory changed, send broadcast:" + intent.toString());
+        	} else {
+        		intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        		intent.setData(Uri.fromFile(new File(path)));
+        		Log.v(LOG_TAG, "file changed, send broadcast:" + intent.toString());
+        	}
+        	mContext.sendBroadcast(intent);
         }
-        mContext.sendBroadcast(intent);
     }
 
     public void onOperationDelete() {

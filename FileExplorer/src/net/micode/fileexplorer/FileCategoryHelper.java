@@ -47,6 +47,7 @@ public class FileCategoryHelper {
 
     private static final String LOG_TAG = "FileCategoryHelper";
 
+    /**文件类型名*/
     public enum FileCategory {
         All, Music, Video, Picture, Theme, Doc, Zip, Apk, Custom, Other, Favorite
     }
@@ -59,6 +60,7 @@ public class FileCategoryHelper {
 
     public static HashMap<FileCategory, FilenameExtFilter> filters = new HashMap<FileCategory, FilenameExtFilter>();
 
+    /**文件类型对应的名称*/
     public static HashMap<FileCategory, Integer> categoryNames = new HashMap<FileCategory, Integer>();
 
     static {
@@ -79,6 +81,7 @@ public class FileCategoryHelper {
             FileCategory.Doc, FileCategory.Zip, FileCategory.Apk, FileCategory.Other
     };
 
+    /**当前属性*/
     private FileCategory mCategory;
 
     private Context mContext;
@@ -130,6 +133,7 @@ public class FileCategoryHelper {
         }
     }
 
+    /**属性信息*/
     public class CategoryInfo {
         public long count;
 
@@ -146,7 +150,7 @@ public class FileCategoryHelper {
         info.size = size;
     }
 
-
+    /**生成‘文档’类型的查询条件*/
     private String buildDocSelection() {
         StringBuilder selection = new StringBuilder();
         Iterator<String> iter = Util.sDocMimeTypesSet.iterator();
@@ -156,6 +160,11 @@ public class FileCategoryHelper {
         return  selection.substring(0, selection.lastIndexOf(")") + 1);
     }
 
+    /**
+     * 生成属性的查询条件
+     * @param cat
+     * @return
+     */
     private String buildSelectionByCategory(FileCategory cat) {
         String selection = null;
         switch (cat) {
@@ -177,6 +186,11 @@ public class FileCategoryHelper {
         return selection;
     }
 
+    /**
+     * 生成查询类型的Uri
+     * @param cat
+     * @return
+     */
     private Uri getContentUriByCategory(FileCategory cat) {
         Uri uri;
         String volumeName = "external";
@@ -202,6 +216,11 @@ public class FileCategoryHelper {
         return uri;
     }
 
+    /**
+     * 生成查询排序
+     * @param sort
+     * @return
+     */
     private String buildSortOrder(SortMethod sort) {
         String sortOrder = null;
         switch (sort) {
@@ -221,6 +240,12 @@ public class FileCategoryHelper {
         return sortOrder;
     }
 
+    /**
+     * 查询数据库
+     * @param fc
+     * @param sort
+     * @return
+     */
     public Cursor query(FileCategory fc, SortMethod sort) {
         Uri uri = getContentUriByCategory(fc);
         String selection = buildSelectionByCategory(fc);
@@ -238,6 +263,9 @@ public class FileCategoryHelper {
         return mContext.getContentResolver().query(uri, columns, selection, null, sortOrder);
     }
 
+    /**
+     * 查询数据库，刷新文件属性
+     */
     public void refreshCategoryInfo() {
         // clear
         for (FileCategory fc : sCategories) {
@@ -283,6 +311,11 @@ public class FileCategoryHelper {
         return false;
     }
 
+    /**
+     * 通过文件名获取文件类型
+     * @param path
+     * @return
+     */
     public static FileCategory getCategoryFromPath(String path) {
         MediaFileType type = MediaFile.getFileType(path);
         if (type != null) {

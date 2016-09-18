@@ -121,6 +121,9 @@ public class FileCategoryActivity extends Fragment implements IFileInteractionLi
         mActivity.registerReceiver(mScannerReceiver, intentFilter);
     }
 
+    /**
+     * 属性条设置
+     */
     private void setupCategoryInfo() {
         mFileCagetoryHelper = new FileCategoryHelper(mActivity);
 
@@ -141,6 +144,9 @@ public class FileCategoryActivity extends Fragment implements IFileInteractionLi
         }
     }
 
+    /**
+     * 更新属性信息
+     */
     public void refreshCategoryInfo() {
         SDCardInfo sdCardInfo = Util.getSDCardInfo();
         if (sdCardInfo != null) {
@@ -167,6 +173,7 @@ public class FileCategoryActivity extends Fragment implements IFileInteractionLi
         }
 
         if (sdCardInfo != null) {
+        	//TODO 这里的计算有问题
             long otherSize = sdCardInfo.total - sdCardInfo.free - size;
             setCategorySize(FileCategory.Other, otherSize);
             setCategoryBarValue(FileCategory.Other, otherSize);

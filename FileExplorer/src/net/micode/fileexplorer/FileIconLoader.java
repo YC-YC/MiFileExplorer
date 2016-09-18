@@ -41,6 +41,7 @@ import android.widget.ImageView;
 
 /**
  * Asynchronously loads file icons and thumbnail, mostly single-threaded.
+ * 加载缩略图，HandleThread加载，完成会回调
  */
 public class FileIconLoader implements Callback {
 
@@ -252,6 +253,12 @@ public class FileIconLoader implements Callback {
         return false;
     }
 
+    /**
+     * 查询视频、图片文件的缩略图ID
+     * @param path
+     * @param isVideo
+     * @return
+     */
     public long getDbId(String path, boolean isVideo) {
         String volumeName = "external";
         Uri uri = isVideo ? Video.Media.getContentUri(volumeName) : Images.Media.getContentUri(volumeName);
